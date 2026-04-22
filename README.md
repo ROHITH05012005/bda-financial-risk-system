@@ -1,131 +1,131 @@
-# Financial Risk Analysis & Prediction System
+# Risk Navigator: Financial Risk Analysis & Prediction System 🛡️📊
 
-A comprehensive system for **Credit Risk Assessment** and **Fraud Detection** built with Python, XGBoost, Isolation Forest, and SHAP explainability.
+A professional, full-stack risk management platform for **Credit Risk Assessment** and **Fraud Detection**. Built with high-performance machine learning models, explainable AI (XAI), and real-time MongoDB persistence.
 
-## Features
+---
 
-- **Credit Risk Prediction** — XGBoost classifier predicts loan default probability with engineered features (DTI, payment-to-income ratio, etc.)
-- **Fraud Detection** — Dual-model approach: XGBoost classifier + Isolation Forest anomaly detection with combined risk scoring
-- **Explainable AI (XAI)** — SHAP-based explanations for every prediction; regulators can see *why* a risk was flagged
-- **Stress-Testing Simulator** — What-If scenarios (market crash, recession, interest rate hike) to assess portfolio resilience
-- **Interactive Dashboard** — React-based risk cockpit with gauges, charts, and batch analysis
-- **REST API** — FastAPI backend for real-time prediction serving
+### 🌐 Live Deployment
+- **Dashboard**: [https://bda-financial-risk-system.vercel.app](https://bda-financial-risk-system.vercel.app)
+- **API (FastAPI)**: [https://bda-financial-risk-api.onrender.com](https://bda-financial-risk-api.onrender.com)
 
-## Architecture
+---
+
+## 🚀 Key Features
+
+- **Credit Risk Engine** — XGBoost classifier predicting loan default probabilities based on real-world financial indicators (debt-to-income, credit history, etc.).
+- **Hybrid Fraud Detection** — Dual-model approach combining an XGBoost classifier for known patterns and an Isolation Forest for novel anomaly detection.
+- **Explainable AI (XAI)** — Integrated SHAP visualizations providing a "Why?" for every single risk score to meet regulatory transparency requirements.
+- **Stress-Testing Simulator** — "What-If" scenario modeling (Market Crash, Recession, etc.) allowing users to stress-test arbitrary portfolios against macroeconomic shocks.
+- **History Cockpit** — Dedicated persistence layer using MongoDB to log every prediction and monitoring system health.
+- **Glassmorphic UI** — High-end React dashboard with custom CSS, interactive Gauges, and real-time performance metrics.
+
+---
+
+## 🏗️ Architecture
+
+```mermaid
+graph TD
+    subgraph Frontend [React Frontend - Vercel]
+        UI[Glassmorphic Dashboard]
+        Charts[Plotly & Gauges]
+    end
+
+    subgraph Backend [FastAPI Backend - Render]
+        API[REST API Gateway]
+        Engine[Model Engine - XGBoost]
+        XAI[SHAP Explainer]
+        Tester[Stress-Test Simulator]
+    end
+
+    subgraph Storage [Database - MongoDB Atlas]
+        DB[(Risk History)]
+    end
+
+    UI <--> API
+    API <--> Engine
+    API <--> XAI
+    API <--> Tester
+    API --> DB
+```
+
+---
+
+## 📂 Project Structure
 
 ```
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│  Data Ingestion │───>│ Feature Engineer │───>│  Model Engine   │
-│  (Synthetic/CSV)│    │  (DTI, RSI, etc) │    │  (XGB + IF)     │
-└─────────────────┘    └──────────────────┘    └────────┬────────┘
-                                                        │
-                        ┌──────────────────┐    ┌───────┴─────────┐
-                        │  SHAP Explainer  │<───┤  Risk Scoring   │
-                        │  (XAI)           │    │  & Thresholding │
-                        └──────────────────┘    └───────┬─────────┘
-                                                        │
-                        ┌──────────────────┐    ┌───────┴─────────┐
-                        │  Stress Tester   │<───┤  React UI       │
-                        │  (What-If)       │    │  + FastAPI      │
-                        └──────────────────┘    └─────────────────┘
+├── frontend/                       # React (Vite) Application
+│   ├── src/pages/                  # Dashboard, Credit, Fraud, History
+│   ├── src/services/api.js         # API integration with Environment support
+│   └── vercel.json                 # Vercel Deployment Configuration
+├── src/                            # Backend Source
+│   ├── api/main.py                 # FastAPI Gateway & Endpoints
+│   ├── database.py                 # MongoDB Integration & Logging
+│   ├── models/                     # ML Model Implementations
+│   ├── preprocessing.py            # Feature Engineering & SMOTE
+│   └── explainability.py           # SHAP Interpretation Engine
+├── data/                           # Generated Training Datasets
+├── models/                         # Serialized .pkl Binaries
+├── render.yaml                     # Render Infrastructure-as-Code
+└── requirements.txt                # Python Dependencies
 ```
 
-## Quick Start
+---
 
-### 1. Install Dependencies
+## 🛠️ Local Setup & Core Workflow
 
+### 1. Environment Preparation
+Ensure you have Python 3.11+ and Node.js installed.
 ```bash
+# Clone the repository
+git clone https://github.com/ROHITH05012005/bda-financial-risk-system.git
+cd bda-financial-risk-system
+
+# Install Python dependencies
 pip install -r requirements.txt
 ```
 
-### 2. Train Models
-
+### 2. Model Training
+Generate the synthetic data and train the predictive engines:
 ```bash
 python train_models.py
 ```
 
-This generates synthetic data and trains both models. Expected output:
-- Credit Risk XGBoost ROC-AUC: ~0.95+
-- Fraud Detection XGBoost ROC-AUC: ~0.98+
-
-### 3. Launch Dashboard
-
+### 3. Launch the System
 ```bash
+# Start Backend
+python -m src.api.main
+
+# Start Frontend (in another terminal)
 cd frontend
 npm install
 npm run dev
 ```
 
+---
 
-### 4. Start API Server (Optional)
+## 🛡️ Risk Methodology
 
-```bash
-python -m src.api.main
-```
+### Scoring Thresholds
+| Risk Level | Range (Probability) | Standard Response |
+| :--- | :--- | :--- |
+| **LOW** | 0 – 30% | Automated Approval |
+| **MEDIUM** | 30 – 60% | Manual Underwriter Review |
+| **HIGH** | 60 – 80% | Enhanced Due Diligence |
+| **CRITICAL** | 80 – 100% | Immediate Escalation / Rejection |
 
-API available at `http://localhost:8001` with auto-docs at `/docs`.
+### Model Performance
+- **Credit Risk (XGBoost)**: ~0.95+ ROC-AUC
+- **Fraud Detection (Hybrid)**: ~0.98+ ROC-AUC
 
-## API Endpoints
+---
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/predict/credit` | POST | Predict loan default probability |
-| `/predict/fraud` | POST | Detect transaction fraud |
-| `/explain/credit` | POST | Credit prediction with SHAP explanation |
-| `/explain/fraud` | POST | Fraud prediction with SHAP explanation |
-| `/stress-test` | POST | Run What-If stress test scenario |
-| `/model/info` | GET | Model metrics and configuration |
-| `/scenarios` | GET | Available stress test scenarios |
+## ☁️ Deployment Configuration
 
-## Project Structure
+This project is configured for **Auto-Deployment**:
+- **Backend (Render)**: Automatically triggers from GitHub pushes, runs `train_models.py` during build, and starts the uvicorn server.
+- **Frontend (Vercel)**: Connects to the Render API via the `VITE_API_URL` environment variable.
+- **Database (MongoDB Atlas)**: Provides global persistence for analytical auditing.
 
-```
-├── frontend/                       # React dashboard
-├── train_models.py                 # Training pipeline
-├── requirements.txt                # Dependencies
-├── src/
-│   ├── config.py                   # Configuration & paths
-│   ├── data_ingestion.py           # Synthetic data generators
-│   ├── preprocessing.py            # Feature engineering & SMOTE
-│   ├── explainability.py           # SHAP explainer
-│   ├── stress_test.py              # What-If simulator
-│   ├── models/
-│   │   ├── credit_risk_model.py    # XGBoost credit classifier
-│   │   └── fraud_detection_model.py # XGBoost + Isolation Forest
-│   └── api/
-│       └── main.py                 # FastAPI server
-├── data/                           # Generated CSVs
-└── models/                         # Saved .pkl models
-```
+---
 
-## Risk Scoring
-
-### Credit Risk
-| Score Range | Risk Level | Action |
-|------------|-----------|--------|
-| 0 – 30% | LOW | Auto-approve |
-| 30 – 60% | MEDIUM | Manual review |
-| 60 – 80% | HIGH | Enhanced due diligence |
-| 80 – 100% | CRITICAL | Reject / escalate |
-
-### Fraud Detection
-| Score Range | Risk Level | Action |
-|------------|-----------|--------|
-| 0 – 20% | LOW | Allow transaction |
-| 20 – 50% | MEDIUM | Flag for review |
-| 50 – 75% | HIGH | Block & verify |
-| 75 – 100% | CRITICAL | Block & alert |
-
-## Stress Test Scenarios
-
-- **Market Crash** — Interest rates +50%, credit scores -50, DTI +30%
-- **Recession** — Income -30%, employment years -50%, DTI +40%
-- **Interest Rate Hike** — Interest rates +100%, monthly payments +30%
-- **Credit Crunch** — Credit scores -80, credit lines -50%, utilization +50%
-
-## Key Design Decisions
-
-- **Recall over Accuracy**: In financial risk, missing a real threat (false negative) is far costlier than a false alarm
-- **SMOTE for Imbalance**: Both credit defaults and fraud are rare events; SMOTE balances training data
-- **Dual Fraud Model**: XGBoost handles classification while Isolation Forest catches novel anomalies the classifier hasn't seen
-- **SHAP Explainability**: Every prediction comes with feature-level explanations for regulatory compliance
+*This project was developed as a comprehensive Big Data Analytics (BDA) solution for modern fintech risk assessment.*

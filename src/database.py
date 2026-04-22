@@ -1,6 +1,10 @@
 """
-MongoDB connection and logging utilities.
-Gracefully falls back to no-op mode if MONGO_URI is not set.
+Risk Navigator - Persistence & Auditing Layer
+MongoDB Integration Module
+
+This module handles connection management for MongoDB and provides logging 
+functions to persist model predictions for historical auditing and UI visualization.
+It supports local .env configuration and automatic cloud-environment detection.
 """
 import os
 from datetime import datetime, timezone

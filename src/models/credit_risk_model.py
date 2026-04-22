@@ -1,3 +1,11 @@
+"""
+Risk Navigator - Credit Risk Analytics
+Predictive Engine Implementation
+
+This module contains the CreditRiskModel class which implements an XGBoost-based 
+classifier for predicting loan default probability. It includes training, 
+evaluation, batch prediction, and risk thresholding logic.
+"""
 import numpy as np
 import pandas as pd
 from sklearn.linear_model import LogisticRegression

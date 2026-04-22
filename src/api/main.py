@@ -1,3 +1,14 @@
+"""
+Risk Navigator - Financial Risk Analysis & Prediction System
+FastAPI Backend Gateway
+
+This module serves as the primary REST API for the Financial Risk system, 
+providing endpoints for credit risk prediction, fraud detection, 
+SHAP explainability, and macroeconomic stress testing.
+
+Author: BDA Project Team
+Date: April 2026
+"""
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field

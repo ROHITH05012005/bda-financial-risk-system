@@ -1,28 +1,77 @@
-# Running the BDA Project
+# Setup & Run Instructions
 
-This document outlines the exact commands needed to start the Financial Risk Analysis System project. The project consists of a Python FastAPI backend and a React/Vite frontend.
+This guide provides the necessary steps to set up the **Risk Navigator** project both locally and for production deployment.
 
-## 1. Start the Backend API Server
+---
 
-Open a terminal at the root of the project (`c:\Users\rohib\BDA PROJECT`) and run the following command:
+## 💻 Local Setup (Localhost)
 
-```bash
-python -m src.api.main
-```
+Follow these steps to run the full stack on your machine.
 
-By default, the backend server will start on `http://0.0.0.0:8001/` (or `http://localhost:8001/`).
+### 1. Prerequisites
+- **Python 3.11+**
+- **Node.js 18+**
+- **MongoDB** (Local instance running on port 27017)
 
-## 2. Start the Frontend Application
+### 2. Backend Configuration
+1. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+2. Train the models (required for first-time use):
+   ```bash
+   python train_models.py
+   ```
+3. Create a `.env` file in the root directory:
+   ```env
+   # Local MongoDB connection
+   MONGO_URI=mongodb://localhost:27017/
+   ```
+4. Start the API:
+   ```bash
+   python -m src.api.main
+   ```
 
-Open a **separate** terminal, navigate to the `frontend` directory, and start the development server:
+### 3. Frontend Configuration
+1. Navigate to the `frontend` folder:
+   ```bash
+   cd frontend
+   npm install
+   ```
+2. Start the dev server:
+   ```bash
+   npm run dev
+   ```
+   - Access the dashboard at [http://localhost:5173](http://localhost:5173).
 
-```bash
-cd frontend
-npm run dev
-```
+---
 
-The frontend will typically start on `http://localhost:5173/` (or `http://localhost:5174/` if the port is already in use).
+## 🌐 Production Deployment (Cloud)
 
-## Important Notes
-- **Keep both terminals running** simultaneously for the application to function properly.
-- If you encounter a `[winerror 10048] address already in use` error for the backend, it means another instance of the backend is already running on port 8001 in the background.
+The system is designed for a split deployment using **Render** (Backend) and **Vercel** (Frontend).
+
+### 1. MongoDB Atlas (Database)
+- Create a free cluster at [mongodb.com/atlas](https://www.mongodb.com/cloud/atlas).
+- Set Network Access to `0.0.0.0/0` to allow Render connections.
+- Copy your connection string.
+
+### 2. Render (Backend API)
+- Connect your GitHub repository to Render as a **Web Service**.
+- Render will automatically use the `render.yaml` or `Procfile`.
+- **Environment Variables**:
+  - Add `MONGO_URI` = Your Atlas connection string.
+  - Ensure `PYTHON_VERSION` = `3.11.0`.
+
+### 3. Vercel (Frontend UI)
+- Connect your GitHub repository to Vercel.
+- Set the **Root Directory** to `frontend`.
+- **Environment Variables**:
+  - Add `VITE_API_URL` = Your Render Web Service URL (e.g., `https://...onrender.com`).
+
+---
+
+## 🛠️ Troubleshooting
+
+- **"Address already in use"**: Kill the process on port 8001 (Backend) or 5173 (Frontend).
+- **"Bad Auth"**: Check that your MongoDB Atlas password doesn't contain special symbols like `@` or `:`.
+- **"Models not found"**: Ensure `python train_models.py` has been run on whichever environment is hosting the backend.

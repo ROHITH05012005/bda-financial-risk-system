@@ -3,6 +3,14 @@ import os
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
+"""
+Risk Navigator - Model Orchestrator
+Automated Training Pipeline
+
+This script serves as the primary entry point for model training. It orchestrates 
+synthetic data generation, feature engineering, and model training for both 
+the Credit Risk and Fraud Detection engines.
+"""
 from src.models.credit_risk_model import CreditRiskModel
 from src.models.fraud_detection_model import FraudDetectionModel
 

@@ -1,3 +1,11 @@
+"""
+Risk Navigator - Fraud Analytics
+Hybrid Predictive Engine Implementation
+
+This module implements a dual-model fraud detection architecture. It combines 
+a supervised Gradient Boosting classifier for known fraud patterns and an 
+unsupervised Isolation Forest for catching anomalous transaction behaviors.
+"""
 import numpy as np
 import pandas as pd
 from sklearn.ensemble import IsolationForest, GradientBoostingClassifier
