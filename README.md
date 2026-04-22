@@ -8,7 +8,7 @@ A comprehensive system for **Credit Risk Assessment** and **Fraud Detection** bu
 - **Fraud Detection** — Dual-model approach: XGBoost classifier + Isolation Forest anomaly detection with combined risk scoring
 - **Explainable AI (XAI)** — SHAP-based explanations for every prediction; regulators can see *why* a risk was flagged
 - **Stress-Testing Simulator** — What-If scenarios (market crash, recession, interest rate hike) to assess portfolio resilience
-- **Interactive Dashboard** — Streamlit-based risk cockpit with gauges, charts, and batch analysis
+- **Interactive Dashboard** — React-based risk cockpit with gauges, charts, and batch analysis
 - **REST API** — FastAPI backend for real-time prediction serving
 
 ## Architecture
@@ -25,7 +25,7 @@ A comprehensive system for **Credit Risk Assessment** and **Fraud Detection** bu
                         └──────────────────┘    └───────┬─────────┘
                                                         │
                         ┌──────────────────┐    ┌───────┴─────────┐
-                        │  Stress Tester   │<───┤  Streamlit UI   │
+                        │  Stress Tester   │<───┤  React UI       │
                         │  (What-If)       │    │  + FastAPI      │
                         └──────────────────┘    └─────────────────┘
 ```
@@ -51,10 +51,11 @@ This generates synthetic data and trains both models. Expected output:
 ### 3. Launch Dashboard
 
 ```bash
-streamlit run app.py
+cd frontend
+npm install
+npm run dev
 ```
 
-Or use the in-dashboard "Train Models" button on first launch.
 
 ### 4. Start API Server (Optional)
 
@@ -62,7 +63,7 @@ Or use the in-dashboard "Train Models" button on first launch.
 python -m src.api.main
 ```
 
-API available at `http://localhost:8000` with auto-docs at `/docs`.
+API available at `http://localhost:8001` with auto-docs at `/docs`.
 
 ## API Endpoints
 
@@ -79,7 +80,7 @@ API available at `http://localhost:8000` with auto-docs at `/docs`.
 ## Project Structure
 
 ```
-├── app.py                          # Streamlit dashboard
+├── frontend/                       # React dashboard
 ├── train_models.py                 # Training pipeline
 ├── requirements.txt                # Dependencies
 ├── src/

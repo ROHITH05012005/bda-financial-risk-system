@@ -5,115 +5,124 @@ import { TrendingUp, AlertTriangle, Shield, Activity } from 'lucide-react';
 
 export default function Dashboard() {
   const [info, setInfo] = useState(null);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getSystemInfo().then(setInfo).catch(() => {});
+    getSystemInfo()
+      .then((data) => {
+        setInfo(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error('Dashboard error:', err);
+        setError(err.message);
+        setLoading(false);
+      });
   }, []);
 
+  if (loading) return <div className="text-primary p-8">Loading...</div>;
+  if (error) return <div className="color-red p-8">Error: {error}</div>;
+
   return (
-    <div>
+    <div className="animate-fade-in delay-100">
       <div className="mb-8">
-        <h2 className="text-3xl font-bold text-white">Financial Risk Dashboard</h2>
-        <p className="text-slate-400 mt-1">Real-time risk monitoring and analytics</p>
+        <h2 className="text-3xl font-bold text-primary">Financial Risk Dashboard</h2>
+        <p className="text-secondary mt-1">Real-time risk monitoring and analytics</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <MetricCard title="System Status" value={info?.models_loaded ? 'Online' : 'Offline'} subtitle="Model serving" color={info?.models_loaded ? 'green' : 'red'} />
+        <MetricCard
+          title="System Status"
+          value={info?.models_loaded ? 'Online' : 'Offline'}
+          subtitle="ML models serving"
+          color={info?.models_loaded ? 'green' : 'red'}
+        />
         <MetricCard title="Credit Risk Model" value="Gradient Boosting" subtitle="ROC-AUC: 0.91" color="blue" />
-        <MetricCard title="Fraud Detection" value="GB + Isolation Forest" subtitle="Dual model approach" color="purple" />
+        <MetricCard title="Fraud Detection" value="GB + Isolation Forest" subtitle="Dual-model approach" color="purple" />
         <MetricCard title="API Endpoints" value="7" subtitle="REST API active" color="yellow" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
-          <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-blue-400" />
+        <div className="card">
+          <h3 className="text-lg font-semibold text-primary mb-4 flex items-center gap-2">
+            <TrendingUp className="color-blue" style={{ width: '1.25rem', height: '1.25rem' }} />
             Credit Risk Overview
           </h3>
-          <div className="space-y-4">
-            <div className="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg">
-              <span className="text-slate-300">Default Rate</span>
-              <span className="text-red-400 font-semibold">18.6%</span>
-            </div>
-            <div className="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg">
-              <span className="text-slate-300">Avg Credit Score</span>
-              <span className="text-blue-400 font-semibold">680</span>
-            </div>
-            <div className="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg">
-              <span className="text-slate-300">Avg DTI Ratio</span>
-              <span className="text-yellow-400 font-semibold">19.8%</span>
-            </div>
-            <div className="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg">
-              <span className="text-slate-300">Model Recall</span>
-              <span className="text-green-400 font-semibold">70.0%</span>
-            </div>
+          <div className="flex flex-col gap-3">
+            {[
+              { label: 'Default Rate in Dataset', value: '18.6%', color: 'color-red' },
+              { label: 'Average Credit Score', value: '680', color: 'color-blue' },
+              { label: 'Average DTI Ratio', value: '19.8%', color: 'color-yellow' },
+              { label: 'Model Recall (Defaults)', value: '70.0%', color: 'color-green' },
+            ].map(({ label, value, color }) => (
+              <div key={label} className="flex justify-between items-center p-4 glass-panel border-light">
+                <span className="text-secondary text-sm">{label}</span>
+                <span className={`font-semibold ${color}`}>{value}</span>
+              </div>
+            ))}
           </div>
         </div>
 
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
-          <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-            <AlertTriangle className="w-5 h-5 text-red-400" />
+        <div className="card">
+          <h3 className="text-lg font-semibold text-primary mb-4 flex items-center gap-2">
+            <AlertTriangle className="color-red" style={{ width: '1.25rem', height: '1.25rem' }} />
             Fraud Detection Overview
           </h3>
-          <div className="space-y-4">
-            <div className="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg">
-              <span className="text-slate-300">Fraud Rate</span>
-              <span className="text-red-400 font-semibold">5.0%</span>
-            </div>
-            <div className="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg">
-              <span className="text-slate-300">Avg Fraud Amount</span>
-              <span className="text-yellow-400 font-semibold">$4,850</span>
-            </div>
-            <div className="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg">
-              <span className="text-slate-300">Isolation Forest Recall</span>
-              <span className="text-green-400 font-semibold">100%</span>
-            </div>
-            <div className="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg">
-              <span className="text-slate-300">Classifier Recall</span>
-              <span className="text-green-400 font-semibold">100%</span>
-            </div>
+          <div className="flex flex-col gap-3">
+            {[
+              { label: 'Fraud Rate in Dataset', value: '5.0%', color: 'color-red' },
+              { label: 'Average Fraud Amount', value: '$4,850', color: 'color-yellow' },
+              { label: 'Isolation Forest Recall', value: '100%', color: 'color-green' },
+              { label: 'Classifier ROC-AUC', value: '1.00', color: 'color-green' },
+            ].map(({ label, value, color }) => (
+              <div key={label} className="flex justify-between items-center p-4 glass-panel border-light">
+                <span className="text-secondary text-sm">{label}</span>
+                <span className={`font-semibold ${color}`}>{value}</span>
+              </div>
+            ))}
           </div>
         </div>
       </div>
 
-      <div className="mt-6 bg-slate-900 border border-slate-800 rounded-xl p-6">
-        <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-          <Shield className="w-5 h-5 text-purple-400" />
+      <div className="mt-6 card">
+        <h3 className="text-lg font-semibold text-primary mb-4 flex items-center gap-2">
+          <Shield className="color-purple" style={{ width: '1.25rem', height: '1.25rem' }} />
           Risk Level Thresholds
         </h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
-            { level: 'LOW', credit: '0-30%', fraud: '0-20%', color: 'bg-green-500/20 text-green-400 border-green-500/30', action: 'Auto-approve / Allow' },
-            { level: 'MEDIUM', credit: '30-60%', fraud: '20-50%', color: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30', action: 'Manual review / Flag' },
-            { level: 'HIGH', credit: '60-80%', fraud: '50-75%', color: 'bg-red-500/20 text-red-400 border-red-500/30', action: 'Enhanced DD / Block & verify' },
-            { level: 'CRITICAL', credit: '80-100%', fraud: '75-100%', color: 'bg-purple-500/20 text-purple-400 border-purple-500/30', action: 'Reject / Block & alert' },
+            { level: 'LOW', credit: '0–30%', fraud: '0–20%', color: 'bg-green-transparent color-green', action: 'Auto-approve / Allow' },
+            { level: 'MEDIUM', credit: '30–60%', fraud: '20–50%', color: 'bg-yellow-transparent color-yellow', action: 'Manual review / Flag' },
+            { level: 'HIGH', credit: '60–80%', fraud: '50–75%', color: 'bg-red-transparent color-red', action: 'Enhanced DD / Block' },
+            { level: 'CRITICAL', credit: '80–100%', fraud: '75–100%', color: 'bg-purple-transparent color-purple', action: 'Reject / Alert' },
           ].map(({ level, credit, fraud, color, action }) => (
-            <div key={level} className={`border rounded-lg p-4 ${color}`}>
+            <div key={level} className={`card ${color}`} style={{ padding: '1rem', border: 'none' }}>
               <p className="font-bold text-lg">{level}</p>
               <p className="text-sm mt-1">Credit: {credit}</p>
               <p className="text-sm">Fraud: {fraud}</p>
-              <p className="text-xs mt-2 opacity-75">{action}</p>
+              <p className="text-xs mt-2 text-muted">{action}</p>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="mt-6 bg-gradient-to-r from-blue-900/30 to-purple-900/30 border border-blue-500/20 rounded-xl p-6">
-        <div className="flex items-center gap-3 mb-2">
-          <Activity className="w-5 h-5 text-blue-400" />
-          <h3 className="text-lg font-semibold text-white">Quick Start</h3>
+      <div className="mt-6 card bg-blue-transparent" style={{ border: '1px solid rgba(59, 130, 246, 0.2)' }}>
+        <div className="flex items-center gap-3 mb-4">
+          <Activity className="color-blue" style={{ width: '1.25rem', height: '1.25rem' }} />
+          <h3 className="text-lg font-semibold text-primary">Quick Start</h3>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-slate-300">
-          <div className="bg-slate-800/50 rounded-lg p-4">
-            <p className="font-semibold text-white mb-1">1. Credit Risk</p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-secondary">
+          <div className="glass-panel p-4">
+            <p className="font-semibold text-primary mb-1">1. Credit Risk</p>
             <p>Enter applicant details to predict loan default probability with feature explanations.</p>
           </div>
-          <div className="bg-slate-800/50 rounded-lg p-4">
-            <p className="font-semibold text-white mb-1">2. Fraud Detection</p>
+          <div className="glass-panel p-4">
+            <p className="font-semibold text-primary mb-1">2. Fraud Detection</p>
             <p>Analyze transactions using dual-model scoring (classifier + anomaly detection).</p>
           </div>
-          <div className="bg-slate-800/50 rounded-lg p-4">
-            <p className="font-semibold text-white mb-1">3. Stress Testing</p>
+          <div className="glass-panel p-4">
+            <p className="font-semibold text-primary mb-1">3. Stress Testing</p>
             <p>Simulate market crashes, recessions, and interest rate hikes on your portfolio.</p>
           </div>
         </div>

@@ -1,23 +1,27 @@
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 
 const riskColors = {
-  LOW: '#22c55e',
-  MEDIUM: '#eab308',
-  HIGH: '#ef4444',
-  CRITICAL: '#a855f7',
+  LOW: 'var(--accent-green)',
+  MEDIUM: 'var(--accent-yellow)',
+  HIGH: 'var(--accent-red)',
+  CRITICAL: 'var(--accent-purple)',
 };
 
 export default function RiskGauge({ value, riskLevel, size = 200 }) {
   const pct = Math.round(value * 100);
-  const color = riskColors[riskLevel] || '#3b82f6';
+  const color = riskColors[riskLevel] || 'var(--accent-blue)';
+  
+  // Recharts needs actual color hexes, so CSS variables might not map seamlessly in all browsers depending on Recharts version,
+  // but standard recharts handles CSS var parsing via getComputedStyle occasionally or we can pass raw hexes. 
+  // For safety, let's pass hex variables explicitly, or depend on SVG's native css var support. Recharts usually handles it.
   const data = [
     { value: pct, color },
-    { value: 100 - pct, color: '#1e293b' },
+    { value: 100 - pct, color: 'var(--bg-surface-hover)' },
   ];
 
   return (
     <div className="flex flex-col items-center">
-      <div style={{ width: size, height: size }} className="relative">
+      <div style={{ width: size, height: size, position: 'relative' }}>
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
@@ -37,11 +41,17 @@ export default function RiskGauge({ value, riskLevel, size = 200 }) {
             </Pie>
           </PieChart>
         </ResponsiveContainer>
-        <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-3xl font-bold text-white">{pct}%</span>
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+          <span className="text-3xl font-bold text-primary">{pct}%</span>
           <span
-            className="text-xs font-semibold px-2 py-0.5 rounded-full mt-1"
-            style={{ backgroundColor: color + '30', color }}
+            className="text-xs font-semibold"
+            style={{ 
+              backgroundColor: `rgba(255,255,255,0.1)`, 
+              color: color,
+              padding: '0.125rem 0.5rem',
+              borderRadius: '9999px',
+              marginTop: '0.25rem'
+            }}
           >
             {riskLevel}
           </span>

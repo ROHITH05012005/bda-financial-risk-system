@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from typing import Optional
 import pandas as pd
@@ -14,8 +15,16 @@ from src.explainability import RiskExplainer
 
 app = FastAPI(
     title="Financial Risk Analysis API",
-    description="Real-time Credit Risk & Fraud Detection Prediction System",
+    description="Credit Risk & Fraud Detection Prediction System",
     version="1.0.0",
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173", "http://localhost:3000", "http://localhost:4173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 credit_model = CreditRiskModel()
@@ -23,7 +32,6 @@ fraud_model = FraudDetectionModel()
 stress_simulator = None
 credit_explainer = None
 fraud_explainer = None
-
 models_loaded = False
 
 
@@ -41,7 +49,7 @@ def load_models():
         print("All models loaded successfully.")
     except Exception as e:
         print(f"Error loading models: {e}")
-        print("Run 'python train_models.py' first to train and save models.")
+        print("Run 'python train_models.py' first.")
 
 
 @app.on_event("startup")
@@ -49,39 +57,41 @@ async def startup_event():
     load_models()
 
 
+# ── Pydantic schemas ─────────────────────────────────────────────────────────
+
 class CreditRiskRequest(BaseModel):
-    age: int = Field(ge=18, le=100, description="Applicant age")
-    income: float = Field(gt=0, description="Annual income")
-    employment_years: float = Field(ge=0, description="Years employed")
-    loan_amount: float = Field(gt=0, description="Requested loan amount")
-    loan_term: int = Field(gt=0, description="Loan term in months")
-    interest_rate: float = Field(gt=0, description="Annual interest rate %")
-    debt_to_income: float = Field(ge=0, description="Debt-to-income ratio")
-    credit_score: int = Field(ge=300, le=850, description="Credit score")
-    num_credit_lines: int = Field(ge=0, description="Number of credit lines")
-    num_late_payments: int = Field(ge=0, description="Number of late payments")
-    years_credit_history: float = Field(ge=0, description="Years of credit history")
-    num_accounts: int = Field(ge=0, description="Number of accounts")
-    credit_utilization: float = Field(ge=0, le=100, description="Credit utilization %")
-    total_debt: float = Field(ge=0, description="Total outstanding debt")
-    monthly_payment: float = Field(ge=0, description="Monthly payment amount")
+    age: int = Field(ge=18, le=100)
+    income: float = Field(gt=0)
+    employment_years: float = Field(ge=0)
+    loan_amount: float = Field(gt=0)
+    loan_term: int = Field(gt=0)
+    interest_rate: float = Field(gt=0)
+    debt_to_income: float = Field(ge=0)
+    credit_score: int = Field(ge=300, le=850)
+    num_credit_lines: int = Field(ge=0)
+    num_late_payments: int = Field(ge=0)
+    years_credit_history: float = Field(ge=0)
+    num_accounts: int = Field(ge=0)
+    credit_utilization: float = Field(ge=0, le=100)
+    total_debt: float = Field(ge=0)
+    monthly_payment: float = Field(ge=0)
 
 
 class FraudDetectionRequest(BaseModel):
-    amount: float = Field(gt=0, description="Transaction amount")
-    hour_of_day: int = Field(ge=0, le=23, description="Hour of transaction")
-    day_of_week: int = Field(ge=0, le=6, description="Day of week (0=Mon)")
-    is_weekend: int = Field(ge=0, le=1, description="Is weekend (0/1)")
-    merchant_category: int = Field(ge=0, le=9, description="Merchant category code")
-    distance_from_home: float = Field(ge=0, description="Distance from home (km)")
-    distance_from_last_transaction: float = Field(ge=0, description="Distance from last txn (km)")
-    ratio_to_median_amount: float = Field(gt=0, description="Ratio to median amount")
-    is_online: int = Field(ge=0, le=1, description="Is online transaction (0/1)")
-    is_international: int = Field(ge=0, le=1, description="Is international (0/1)")
-    txn_count_1h: int = Field(ge=0, description="Transaction count in last 1h")
-    txn_count_24h: int = Field(ge=0, description="Transaction count in last 24h")
-    avg_amount_7d: float = Field(ge=0, description="Average amount over 7 days")
-    std_amount_7d: float = Field(ge=0, description="Std dev of amount over 7 days")
+    amount: float = Field(gt=0)
+    hour_of_day: int = Field(ge=0, le=23)
+    day_of_week: int = Field(ge=0, le=6)
+    is_weekend: int = Field(ge=0, le=1)
+    merchant_category: int = Field(ge=0, le=9)
+    distance_from_home: float = Field(ge=0)
+    distance_from_last_transaction: float = Field(ge=0)
+    ratio_to_median_amount: float = Field(gt=0)
+    is_online: int = Field(ge=0, le=1)
+    is_international: int = Field(ge=0, le=1)
+    txn_count_1h: int = Field(ge=0)
+    txn_count_24h: int = Field(ge=0)
+    avg_amount_7d: float = Field(ge=0)
+    std_amount_7d: float = Field(ge=0)
 
 
 class StressTestRequest(BaseModel):
@@ -90,6 +100,8 @@ class StressTestRequest(BaseModel):
     custom_adjustments: Optional[dict] = Field(None, description="Custom feature adjustments")
     sample_size: int = Field(100, ge=10, le=1000, description="Number of samples to test")
 
+
+# ── Endpoints ────────────────────────────────────────────────────────────────
 
 @app.get("/")
 async def root():
@@ -163,7 +175,7 @@ async def run_stress_test(request: StressTestRequest):
     elif request.risk_type == "fraud":
         from src.data_ingestion import load_fraud_data
         df = load_fraud_data().sample(n=min(request.sample_size, 1000), random_state=42)
-        result = stress_simulator.run_fraud_stress_test(df)
+        result = stress_simulator.run_fraud_stress_test(df, multiplier=3.0)
     else:
         raise HTTPException(status_code=400, detail="risk_type must be 'credit' or 'fraud'")
 
@@ -190,9 +202,10 @@ async def model_info():
 
 @app.get("/scenarios")
 async def get_scenarios():
-    return stress_simulator.get_available_scenarios() if stress_simulator else []
+    from src.config import STRESS_TEST_SCENARIOS
+    return [{"name": k, "adjustments": v} for k, v in STRESS_TEST_SCENARIOS.items()]
 
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8001)

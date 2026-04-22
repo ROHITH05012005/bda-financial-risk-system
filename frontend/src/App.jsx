@@ -4,19 +4,20 @@ import Dashboard from './pages/Dashboard';
 import CreditRisk from './pages/CreditRisk';
 import FraudDetection from './pages/FraudDetection';
 import StressTesting from './pages/StressTesting';
-
+import ModelPerformance from './pages/ModelPerformance';
 
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route element={<Layout />}>
-          <Route index element={<Dashboard />} />
-          <Route path="credit" element={<CreditRisk />} />
-          <Route path="fraud" element={<FraudDetection />} />
-          <Route path="stress" element={<StressTesting />} />
-        </Route>
-      </Routes>
+      <Layout>
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/credit" element={<CreditRisk />} />
+          <Route path="/fraud" element={<FraudDetection />} />
+          <Route path="/stress" element={<StressTesting />} />
+          <Route path="/performance" element={<ModelPerformance />} />
+        </Routes>
+      </Layout>
     </BrowserRouter>
   );
 }
