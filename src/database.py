@@ -22,7 +22,12 @@ def get_db():
     if _db is not None or not _enabled:
         return _db
 
-    mongo_uri = os.environ.get("MONGO_URI", "")
+    # Check for various common environment variable names (supporting Render, Atlas, and Railway)
+    mongo_uri = os.environ.get("MONGO_URI") or \
+                os.environ.get("MONGODB_URL") or \
+                os.environ.get("MONGO_URL") or \
+                ""
+    
     if not mongo_uri:
         return None
 
