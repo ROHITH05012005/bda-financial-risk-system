@@ -32,9 +32,9 @@ def get_db():
         client.admin.command("ping")          # verify connection
         _db = client["financial_risk"]
         _enabled = True
-        print("✅ MongoDB connected.")
+        print("Connected to MongoDB successfully.")
     except Exception as e:
-        print(f"⚠️  MongoDB unavailable: {e}. Running without persistence.")
+        print(f"MongoDB unavailable: {e}. Running without persistence.")
         _enabled = False
     return _db
 
