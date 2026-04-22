@@ -6,6 +6,13 @@ import os
 from datetime import datetime, timezone
 from typing import Optional
 
+# Load .env file if present (local dev). On Render, env vars are set via dashboard.
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
 _db = None
 _enabled = False
 
