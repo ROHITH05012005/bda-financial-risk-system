@@ -12,6 +12,7 @@ from src.models.credit_risk_model import CreditRiskModel
 from src.models.fraud_detection_model import FraudDetectionModel
 from src.stress_test import StressTestSimulator
 from src.explainability import RiskExplainer
+from src.database import init_db, log_credit_prediction, log_fraud_prediction, get_recent_predictions, get_db_stats
 
 app = FastAPI(
     title="Financial Risk Analysis API",
@@ -64,6 +65,7 @@ def load_models():
 
 @app.on_event("startup")
 async def startup_event():
+    init_db()
     load_models()
 
 
@@ -137,6 +139,7 @@ async def predict_credit_risk(request: CreditRiskRequest):
         raise HTTPException(status_code=503, detail="Models not loaded. Run train_models.py first.")
     df = pd.DataFrame([request.model_dump()])
     result = credit_model.predict(df)
+    log_credit_prediction(request.model_dump(), result)
     return result
 
 
@@ -146,6 +149,7 @@ async def predict_fraud(request: FraudDetectionRequest):
         raise HTTPException(status_code=503, detail="Models not loaded. Run train_models.py first.")
     df = pd.DataFrame([request.model_dump()])
     result = fraud_model.predict(df)
+    log_fraud_prediction(request.model_dump(), result)
     return result
 
 
@@ -214,6 +218,20 @@ async def model_info():
 async def get_scenarios():
     from src.config import STRESS_TEST_SCENARIOS
     return [{"name": k, "adjustments": v} for k, v in STRESS_TEST_SCENARIOS.items()]
+
+
+@app.get("/history/{risk_type}")
+async def get_history(risk_type: str, limit: int = 50):
+    """Retrieve recent predictions from MongoDB (credit or fraud)."""
+    if risk_type not in ("credit", "fraud"):
+        raise HTTPException(status_code=400, detail="risk_type must be 'credit' or 'fraud'")
+    return {"risk_type": risk_type, "records": get_recent_predictions(risk_type, limit)}
+
+
+@app.get("/db/stats")
+async def db_stats():
+    """Return MongoDB connection status and document counts."""
+    return get_db_stats()
 
 
 if __name__ == "__main__":

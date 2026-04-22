@@ -18,5 +18,7 @@ export const runStressTest = (data) => api.post('/stress-test', data).then((r) =
 export const getModelInfo = () => api.get('/model/info').then((r) => r.data);
 export const getScenarios = () => api.get('/scenarios').then((r) => r.data);
 export const getSystemInfo = () => api.get('/').then((r) => r.data);
+export const getHistory = (type, limit = 50) => api.get(`/history/${type}?limit=${limit}`).then((r) => r.data);
+export const getDbStats = () => api.get('/db/stats').then((r) => r.data);
 
 export default api;

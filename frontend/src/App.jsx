@@ -5,6 +5,7 @@ import CreditRisk from './pages/CreditRisk';
 import FraudDetection from './pages/FraudDetection';
 import StressTesting from './pages/StressTesting';
 import ModelPerformance from './pages/ModelPerformance';
+import History from './pages/History';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <Route path="/fraud" element={<FraudDetection />} />
           <Route path="/stress" element={<StressTesting />} />
           <Route path="/performance" element={<ModelPerformance />} />
+          <Route path="/history" element={<History />} />
         </Routes>
       </Layout>
     </BrowserRouter>

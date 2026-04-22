@@ -6,6 +6,7 @@ import {
   FlaskConical,
   BarChart3,
   Shield,
+  Database,
 } from 'lucide-react';
 
 const navItems = [
@@ -14,6 +15,7 @@ const navItems = [
   { to: '/fraud', icon: Search, label: 'Fraud Detection' },
   { to: '/stress', icon: FlaskConical, label: 'Stress Testing' },
   { to: '/performance', icon: BarChart3, label: 'Model Performance' },
+  { to: '/history', icon: Database, label: 'History' },
 ];
 
 export default function Layout({ children }) {
